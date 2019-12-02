@@ -46,7 +46,6 @@ class Database:
     def fetch_substitute(self,category,users_choice_id):
         self.user_research.append(users_choice_id)
 
-
         for i in range (1,4):
             try:
                 kursor.execute ("SELECT id FROM Product WHERE nova = %s AND category = %s",(i,category))
@@ -55,7 +54,19 @@ class Database:
                 self.user_research.append(result[rand][0])
             except:
                 pass
+"""
+    def log_in_bd(self):
+        col = ['no','sub1','sub2','sub3']
+        for i in range (0,4):
+            try:
+                kursor.execute("INSERT INTO Favourites (%s) VALUES (%s)",(col[i],self.user_research[i]))
+            except:
+                pass
+        
 
+        kursor.execute("INSERT INTO Favourites (%s) VALUES (%s)",(col[0],self.user_research[0]))
+        connection.commit()
+"""
 
 connection = mysql.connector.connect(
 host = 'localhost',
@@ -83,80 +94,33 @@ while True:
     
     product_choice = research.secure_input(len(research.temporary_list))
 
-    #print ((research.temporary_list[product_choice-1][4],research.temporary_list[product_choice-1][0]))
-
     research.fetch_substitute(research.temporary_list[product_choice-1][4],research.temporary_list[product_choice-1][0])
 
-    print ("Voici le resultat de votre recherche pour : ")
-    kursor.execute("SELECT name,brand,nova FROM Product WHERE id = %s",(research.user_research[0],))
+    print ("\nVoici le resultat de votre recherche pour : ")
+    kursor.execute("SELECT name,brand,nova FROM Product WHERE id = %s\n",(research.user_research[0],))
     initial_product = kursor.fetchall()
-    print ("Nom du produit : {}, marque:  {}, indice nova : {}".format(initial_product[0][0],initial_product[0][1],initial_product[0][2]))
+    print ("{}, marque:  {}, indice nova : {}\n".format(initial_product[0][0],initial_product[0][1],initial_product[0][2]))
+    print ("Substituts:")
+    for i in range (1,len(research.user_research)):
+        kursor.execute("SELECT name,brand,nova,stores,id FROM Product WHERE id = %s",(research.user_research[i],))
+        total = kursor.fetchall()
+        print ("\nNom du produit : {}, marque:  {}, indice nova : {}, ce produit est en vente dans les enseignes : {}.\n Lien vers une description complete :"
+        " https://fr.openfoodfacts.org/produit/{}\n".format(total[0][0],total[0][1],total[0][2],total[0][3],total[0][4]))
 
+    print ("Voulez-vous enregistrer le resultat de votre recherche dans vos favorits?")
 
-    print ("Voulez-vous effectuer une nouvelle recherche ?\nOui tapez 1 , non tapez 0")
-    again = research.secure_input(1)
+    #research.log_in_bd()
 
+    print ("Voulez-vous effectuer une nouvelle recherche ?\nOui tapez 1 , non tapez 2")
+    again = research.secure_input(2)
+    if again == 2:
+        break
+    elif again == 1:
+        research.user_research = []
+        research.temporary_list = []
+        continue
     break
 
 
 kursor.close()
 connection.close()
-
-
-
-"""
-connection = mysql.connector.connect(
-host = 'localhost',
-user = 'etudiant',
-password = 'motdepasse',
-database = 'pur_beurre'
-)
-kursor = connection.cursor()
-
-
-print ("\n\t*-+/*-+/*-+/*-+Bienvenue dans ce programme de substitution alimentaire/*-+/*-+/*-+/*-+\n")
-print ("\t Ce programme propose une alternative plus saine à ce que vous mangez d'habitude")
-
-kursor.execute("SELECT DISTINCT category FROM Product")
-cat_row = kursor.fetchall()
-categories = []
-cat_len = len(cat_row)
-for i in range(0,cat_len):
-    categories.append(cat_row[i][0])
-
-
-while True:
-    
-    print ("Veuillez choisir une catégorie :\n\nAttention : veuillez n'entrer qu'un chiffre correspondant à la categorie et pressez 'entree'\n")
-
-    for i in range (0,cat_len):
-        print ("Choix {}:{}".format(categories[i],i+1))
-
-    wrong_input = True
-    while wrong_input:
-        while True:
-            try:
-                cat_choice = int(input())
-                break
-            except ValueError:
-                print("choisissez un chiffre qui vous est proposé dans la liste plus haut")
-        if cat_choice <=0 or cat_choice > cat_len:
-            print("choisissez un chiffre qui vous est proposé dans la liste plus haut")
-        else:
-            wrong_input = False
-    
-    kursor.execute("SELECT id FROM Product WHERE nova = '3' AND category = %s",(categories[cat_choice-1],))
-    ids = kursor.fetchall()
-
-    first=(ids[0])
-    kursor.execute("SELECT * FROM Product WHERE id = %s",first)
-    print (kursor.fetchall())
-
-    print (cat_choice)
-
-    break
-
-print ('fin du programme')
-kursor.close()
-connection.close()
-"""
