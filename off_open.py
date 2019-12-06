@@ -37,7 +37,6 @@ class request:
         kursor = connection.cursor()
         add_product = ("INSERT INTO Product (id,name,nova,category,brand,stores) VALUES (%s,%s,%s,%s,%s,%s)")
         
-
         l_cat = len(products)
         for i in range (0,l_cat):
             n_products = len(products[i])
@@ -47,6 +46,8 @@ class request:
                     kursor.execute(add_product,data)
                 except:
                     pass
+
+
         
         connection.commit()
         kursor.close()
