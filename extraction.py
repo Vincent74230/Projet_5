@@ -3,7 +3,7 @@ import requests
 
 
 
-class request:
+class Request:
     def __init__(self):
         self.res_json=[]
 
@@ -55,6 +55,6 @@ class request:
 
 
 categories = ['boissons avec sucre ajoute','pate a tartiner','cafe','chocolat','chips']
-req= request()
+req= Request()
 req.import_products(categories)
 req.record_into_database(req.res_json,categories)
