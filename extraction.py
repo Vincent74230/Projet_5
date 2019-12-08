@@ -2,59 +2,50 @@ import mysql.connector
 import requests
 
 
+def import_products(categories):
 
-class Request:
-    def __init__(self):
-        self.res_json=[]
+    product_items = []
+    for element in categories:
 
-    def import_products(self,categories):
-        l = len(categories)
+        payload = {'action':'process','json':1,'page_size':1000,'tag_0':element,
+        'tag_contains_0':'contains','tagtype_0':'categories','sort_by':'unique_scans_n'}
+        try:
+            response = requests.get('https://fr.openfoodfacts.org/cgi/search.pl',
+            params = payload,headers = {'User-Agent':'Apptest - GNU/Linux - Version 0.1'})
+            print ("Extraction des {} du serveur d'OFF: {} 'ok'".format(element,response))
+        except:
+            print ("Le serveur d'OFF ne répond pas ou la page est introuvable,\n"
+            " veuillez réessayer plus tard. Réponse : {}".format(response))
+        response = response.json()
+        response = response['products']
+        product_items.append(response)
+    return product_items
 
-        for i in range (0,l):
+def record_into_database(product_items,categories):
 
-            payload = {'action':'process','json':1,'page_size':1000,'tag_0':categories[i],
-            'tag_contains_0':'contains','tagtype_0':'categories','sort_by':'unique_scans_n'}
+    connection = mysql.connector.connect(
+    host = 'localhost',
+    user = 'etudiant',
+    password = 'motdepasse',
+    database = 'pur_beurre'
+    )
+    kursor = connection.cursor()
+    add_product = ("INSERT INTO Product (id,name,nova,category,brand,stores) VALUES (%s,%s,%s,%s,%s,%s)")
+    
+    for category_nb,elements in enumerate (product_items):
+        for element in elements:
             try:
-                response = requests.get('https://fr.openfoodfacts.org/cgi/search.pl',
-                params = payload,headers = {'User-Agent':'Apptest - GNU/Linux - Version 0.1'})
-                print ("Extraction des {} du serveur d'OFF: {} 'ok'".format(categories[i],response))
+                data = (element['id'],element['product_name_fr'],element['nova_groups'],categories[category_nb],element['brands'],element['stores'])
+                kursor.execute(add_product,data)
             except:
-                print ("Le serveur d'OFF ne répond pas ou la page est introuvable,\n"
-                " veuillez réessayer plus tard. Réponse : {}".format(response))
-            response = response.json()
-            response = response['products']
+                pass
 
-            self.res_json.append(response)
-
-    def record_into_database(self,products,categories):
-        
-        connection = mysql.connector.connect(
-        host = 'localhost',
-        user = 'etudiant',
-        password = 'motdepasse',
-        database = 'pur_beurre'
-        )
-        kursor = connection.cursor()
-        add_product = ("INSERT INTO Product (id,name,nova,category,brand,stores) VALUES (%s,%s,%s,%s,%s,%s)")
-        
-        l_cat = len(products)
-        for i in range (0,l_cat):
-            n_products = len(products[i])
-            for x in range (0,n_products):
-                try:
-                    data = (products[i][x]['id'],products[i][x]['product_name_fr'],products[i][x]['nova_groups'],categories[i],products[i][x]['brands'],products[i][x]['stores'])
-                    kursor.execute(add_product,data)
-                except:
-                    pass
+            
+    connection.commit()
+    kursor.close()
+    connection.close()
 
 
-        
-        connection.commit()
-        kursor.close()
-        connection.close()
-
-
-categories = ['boissons avec sucre ajoute','pate a tartiner','cafe','chocolat','chips']
-req= Request()
-req.import_products(categories)
-req.record_into_database(req.res_json,categories)
+categories = ['boissons avec sucre ajoute','pate a tartiner','cafe','chocolat','chips']#Those names will be useful to find products in OFF DB and to rename category name of each product in local DB (2 elements minimum)
+product_items = import_products(categories)
+record_into_database(product_items,categories)

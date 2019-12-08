@@ -12,10 +12,9 @@ research = Database()
 research.kursor = connection.cursor()
 
 research.kursor.execute("SELECT DISTINCT category FROM Product")
-cat_row = research.kursor.fetchall()
-research.cat_len = len(cat_row)
-for i in range(0,research.cat_len):
-    research.categories.append(cat_row[i][0])
+categories = research.kursor.fetchall()
+for element in categories:
+    research.categories.append(element[0])
 
 print ("\n\t*-+/*-+/*-+/*-+Bienvenue dans ce programme de substitution alimentaire/*-+/*-+/*-+/*-+\n")
 print ("\t Ce programme propose une alternative plus saine à ce que vous mangez d'habitude")
@@ -26,9 +25,9 @@ while True:
     research.favourites_id = research.kursor.fetchall()
 
     if research.favourites_id == []:
-        for i in range (0,research.cat_len):
-            print ("Choix   {}:   n°{}".format(research.categories[i],i+1))
-        cat_choice = research.secure_input(1,research.cat_len)
+        for i,category in enumerate(research.categories):
+            print ("Choix   {}:   n°{}".format(category,i+1))
+        cat_choice = research.secure_input(1,len(research.categories))
     else:
         print ("Voir vos resultats favoris : pressez 0\n")
         for i in range (0,research.cat_len):
