@@ -26,7 +26,6 @@ while True:
     for i,element in enumerate (research.categories):
         print ("N°{} : {}".format(i,element))
     categoy_choice = research.secure_input(0,len(research.categories)-1)
-    print (categoy_choice)
 
     if categoy_choice == 0:
         research.fetch_favourites()
@@ -35,9 +34,7 @@ while True:
     
     print ("Voulez-vous enregistrer le resultat de votre recherche dans vos favorits?\nOui tapez 1, non tapez 0")
     
-
     logging = research.secure_input(0,1)
-
 
     if logging == 0:
         pass

@@ -5,7 +5,6 @@ class Database:
         self.categories = ['Voir vos favorits']
         self.sub_list = []
         self.user_first_choice_id = 0
-        self.favourites_id = []
         self.kursor = 0
 
     def secure_input(self,minimum,maximum):
