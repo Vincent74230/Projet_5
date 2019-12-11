@@ -1,15 +1,7 @@
 import mysql.connector
-from read_n_write import *
-
-connection = mysql.connector.connect(
-        host = 'localhost',
-        user = 'etudiant',
-        password = 'motdepasse',
-        database = 'pur_beurre'
-        )
+from database import *
 
 research = Database()
-research.kursor = connection.cursor()
 
 research.kursor.execute("SELECT DISTINCT category FROM Product")
 categories = research.kursor.fetchall()
@@ -54,4 +46,4 @@ while True:
 
     
 research.kursor.close()
-connection.close()
+research.connection.close()
