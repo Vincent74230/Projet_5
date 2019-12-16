@@ -3,6 +3,7 @@
 - one for extracting datas from OpenFoodFacts API(retrieve a list as a Json file)
 - the second to record datas in SQL database via mysql client """
 import mysql.connector
+from mysql.connector import errorcode
 import requests
 
 
@@ -30,12 +31,12 @@ def record_into_database(product_items, cats):
     """fonction that logs datas in local SQL DB"""
     connection = mysql.connector.connect(
         host='localhost',
-        user='etudiant',
-        password='motdepasse',
+        user='oc_student',
+        password='password',
         database='pur_beurre'
         )
     kursor = connection.cursor()
-    add_product = ("INSERT INTO Prod (id, name, nova, category, brand, stores)"
+    add_product = ("INSERT INTO Product (id, name, nova, category, brand, stores)"
                    " VALUES (%s, %s, %s, %s, %s, %s)")
 
     for category_nb, elements in enumerate(product_items):#going to see each category of list
@@ -44,16 +45,14 @@ def record_into_database(product_items, cats):
                 data = (element['id'], element['product_name_fr'], element['nova_groups'],
                         cats[category_nb], element['brands'], element['stores'])
                 kursor.execute(add_product, data)
+            except mysql.connector.Error as err:
+                print("Fixed an issue with mysql : {}".format(err))
             except KeyError:
-                print("Fixed an issue with aff datas (key_error)")
-            except mysql.connector.Error:
-                print("Issue with mysql : Fixed")
+                print ("Fixed an issue with OpenFoodFacts datas")
         connection.commit()
     kursor.close()
     connection.close()
 
+#Those names are useful BOTH to find products in OpenFoodFacts DB..
+#..AND to rename category of each product in your local DB (2 elements minimum)
 categories = ['boissons avec sucre ajoute', 'pate a tartiner', 'cafe', 'chocolat', 'chips']
-#Those names will be useful BOTH to find products in OpenFF DB..
-#..AND to rename category of each product in local DB (2 elements minimum)
-product_items = import_products(categories)
-record_into_database(product_items, categories)
