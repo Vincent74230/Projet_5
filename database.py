@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module contains only one class : Database and 6 methods,
+"""Module contains only one class : Database and its 6 methods,
 to R&W into DB"""
 import random
 import mysql.connector
@@ -14,8 +14,8 @@ class Database:
 
         self.connection = mysql.connector.connect(
             host='localhost',
-            user='etudiant',
-            password='motdepasse',
+            user='oc_student',
+            password='password',
             database='pur_beurre')
         self.kursor = self.connection.cursor()
 

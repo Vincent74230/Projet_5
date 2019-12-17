@@ -1,9 +1,10 @@
-"""Master module, from here controls database methods(R&W class)"""
+"""Main module, from here controls database module,
+to read and write into local database"""
 # -*- coding: utf-8 -*-
 from database import *
 
 def main():
-    """Main : contains the main loop of the app, to reboot"""
+    """Main : contains the main loop of the programm"""
 
     research = Database()
 
