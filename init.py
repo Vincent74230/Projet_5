@@ -8,7 +8,7 @@ database_name = 'pur_beurre'
 TABLES = {}
 
 TABLES['Product'] = (
-"CREATE TABLE Product("
+    "CREATE TABLE Product("
     "id VARCHAR(25) NOT NULL,"
     "name VARCHAR(100),"
     "nova VARCHAR(5),"
@@ -55,6 +55,7 @@ except mysql.connector.Error as err:
 
 for table in TABLES:
     description = TABLES[table]
+    print ("Desc ; {}".format(description))
     try:
         print("Creating table {}".format(table))
         kursor.execute(description)
@@ -66,6 +67,7 @@ for table in TABLES:
 
 kursor.close()
 connection.close()
+
 
 product_items = ex.import_products(ex.categories)
 ex.record_into_database(product_items, ex.categories)

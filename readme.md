@@ -1,7 +1,7 @@
 # 'Pur-beurre' application
 ## This programm offers healthier alternatives to what you usually eat
 ---
-### How to install this programm (GNU/LINUX users)
+### How to install this programm (GNU/LINUX : ubuntu)
 
 __You must have a SQL server installed on your system.__
 

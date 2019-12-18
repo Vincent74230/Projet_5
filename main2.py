@@ -1,26 +1,17 @@
-"""Main module, from here controls database module,
-to read and write into local database"""
-print ("coucou")
-from database import *
+from datas import*
+
 
 def main():
-    print ("coucou")
-    """Main : contains the main loop of the programm"""
-
-    research = Datas()
-    print ("coucou")
-    research.kursor.execute("SELECT DISTINCT category FROM Product")
-    categories = research.kursor.fetchall()
-    for element in categories:
+    research = Connect()
+    research.cur.execute("SELECT DISTINCT category FROM Product")
+    temporary_cat = research.cur.fetchall()
+    for element in temporary_cat:
         research.categories.append(element[0])
-
 
     print ("\n\t*-+/*-+/*-+/Bienvenue dans ce programme de substitution alimentaire/*-+/*-+/*-+/\n")
     print ("\t Ce programme propose une alternative plus saine à ce que vous mangez d'habitude\n")
 
     while True:
-        print ("Veuillez faire un choix dans la liste ci-dessous:\n\n")
-
         for i, element in enumerate(research.categories):
             print ("N°{} : {}".format(i, element))
         categoy_choice = research.secure_input(0, len(research.categories)-1)
@@ -40,8 +31,8 @@ def main():
             continue
         break
 
-    research.kursor.close()
-    research.connection.close()
+    research.cur.close()
+    research.con.close()
 
 if __name__ == "__main__":
     main()

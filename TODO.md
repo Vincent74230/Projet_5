@@ -12,7 +12,6 @@ La première contiendra environ 500 produits (500 lignes) avec les attributs (co
 - Categorie du produit
 - Nom du produit
 - Marque
-- Denomination generique
 - indice nova
 - Magasin ou trouver le produit
 

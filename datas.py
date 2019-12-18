@@ -1,24 +1,18 @@
-"""Module contains only one class : Database and its 6 methods,
-to R&W into DB"""
-import random
 import mysql.connector
-print ("coucou2")
-class Datas:
-    """ Class to read and write into DB (read product info from both Product and Product_substitute,
-    write favourite products in Product_substitutes)"""
+import random
+
+
+class Connect:
     def __init__(self):
+        self.con = mysql.connector.connect(
+            host='localhost',
+            user='oc_student',
+            password = "password",
+            database = 'pur_beurre')
+        self.cur = self.con.cursor()
         self.categories = ['Voir vos favorits']
         self.sub_list = []
         self.product_choice_id = 0
-        print("coucou2")
-        self.connection = mysql.connector.connect(
-            host='localhost',
-            user='oc_student',
-            password='password',
-            database='pur_beurre')
-        print ("coucou2")
-        self.kursor = self.connection.cursor()
-        print ("coucou2")
 
     def secure_input(self, minimum, maximum):
         """Give it a low and high limit, it returns a secure int within it"""
@@ -40,9 +34,9 @@ class Datas:
         """Fetches and display 10 examples of nova 4 indice from DB"""
         ten_examples = []
         product_choice_id = 0
-        self.kursor.execute("SELECT id FROM Product WHERE nova = 4 AND category = %s",
+        self.cur.execute("SELECT id FROM Product WHERE nova = 4 AND category = %s",
             (self.categories[cat_choice], ))
-        examples = self.kursor.fetchall()
+        examples = self.cur.fetchall()
         for i in range (0, 10):
             ten_examples.append(examples[random.randint(0, len(examples))][0])
         for i, element in enumerate(ten_examples):
@@ -53,11 +47,10 @@ class Datas:
         product_choice = self.secure_input(1, len(ten_examples))
         self.product_choice_id = ten_examples[product_choice-1]
         self.fetch_substitutes(cat_choice)
-        
     def display_product_from_id(self, product_id):
         """Give it a single id, it will fetch the whole info refering to it"""
-        self.kursor.execute("SELECT name, brand, nova, stores, id FROM Product WHERE id = %s", (product_id, ))
-        response = self.kursor.fetchall()
+        self.cur.execute("SELECT name, brand, nova, stores, id FROM Product WHERE id = %s", (product_id, ))
+        response = self.cur.fetchall()
         response = response[0]
         print ("{} de la marque {} (indice nova : {}), disponible dans les magasins {}.\n"
                "Lien vers une description complete https://fr.openfoodfacts.org/produit/{}\n".
@@ -67,8 +60,8 @@ class Datas:
         """Fetches maximum 3 substitutes, of 1,2 and 3 nova indices in DB,and displays it""" 
         category = self.categories[cat_choice]
         for i in range(1, 4):
-            self.kursor.execute("SELECT id FROM Product WHERE nova = %s AND category = %s", (i, category))
-            response = self.kursor.fetchall()
+            self.cur.execute("SELECT id FROM Product WHERE nova = %s AND category = %s", (i, category))
+            response = self.cur.fetchall()
             if response != []:
                 self.sub_list.append(response[random.randint(0, len(response)-1)][0])
 
@@ -85,20 +78,20 @@ class Datas:
             pass
         elif logging == 1:
             self.log_in_DB()
-            self.connection.commit()
+            self.con.commit()
         
     def log_in_DB(self):
         """Logs favourite resulsts in DB, (the design of Product_substitute in DB is "many-to-many")"""
         for element in self.sub_list:
             add_id = ("INSERT INTO Product_substitute (product_id, substitute_id) VALUES(%s, %s)")
             data = (self.product_choice_id, element)
-            self.kursor.execute(add_id, data)
+            self.cur.execute(add_id, data)
 
     def fetch_favourites(self):
         """Fetches favourites in DB, from an favourite id"""
         while True:
-            self.kursor.execute("SELECT DISTINCT product_id FROM Product_substitute")
-            response = self.kursor.fetchall()
+            self.cur.execute("SELECT DISTINCT product_id FROM Product_substitute")
+            response = self.cur.fetchall()
 
             for i, element in enumerate (response):
                 print ("Tapez {} pour voir les substituts de:".format(i+1))
@@ -106,8 +99,8 @@ class Datas:
             
             choice_id = response[self.secure_input(1, len(response))-1]
             
-            self.kursor.execute("SELECT substitute_id FROM Product_substitute WHERE product_id = %s", (choice_id[0], ))
-            response = self.kursor.fetchall()
+            self.cur.execute("SELECT substitute_id FROM Product_substitute WHERE product_id = %s", (choice_id[0], ))
+            response = self.cur.fetchall()
 
             print("Voici les substituts trouves pour:")
             self.display_product_from_id(choice_id[0])
