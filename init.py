@@ -3,8 +3,9 @@ neccessary to run the programm on user's computer"""
 import mysql.connector
 from mysql.connector import errorcode
 import extraction as ex
+import settings
 
-database_name = 'pur_beurre'
+DATABASE_NAME = 'pur_beurre'
 TABLES = {}
 
 TABLES['Product'] = (
@@ -27,47 +28,48 @@ TABLES['Product_substitute'] = (
     "REFERENCES Product(id)"
     ")ENGINE = InnoDB")
 
-connection = mysql.connector.connect(
-    user='oc_student', password='password', host='localhost')
-kursor = connection.cursor()
+CON = mysql.connector.connect(
+    user= settings.user,
+    password=settings.password,
+    host='localhost')
+KURSOR = CON.cursor()
 
-def create_database(kursor):
-    """Function that create dadabase 'pur_beurre'
+def create_database(kur):
+    """Creating database 'pur_beurre'
     on user's system"""
     try:
-        kursor.execute(
+        kur.execute(
             "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(database_name))
     except mysql.connector.Error as err:
         print ("Failed to create new database : {}".format(err))
         exit(1)
 
 try:
-    kursor.execute("USE {}".format(database_name))
+    KURSOR.execute("USE {}".format(DATABASE_NAME))
 except mysql.connector.Error as err:
-    print ("Database {} does not exist".format(database_name))
+    print ("Database {} does not exist".format(DATABASE_NAME))
     if err.errno == errorcode.ER_BAD_DB_ERROR:
-        create_database(kursor)
-        print ("Database {} created successfully.".format(database_name))
-        connection.database = database_name
+        create_database(KURSOR,DATABASE_NAME)
+        print ("Database {} created successfully.".format(DATABASE_NAME))
+        CON.database = DATABASE_NAME
     else:
         print("An error has occured during database creation : {}".format(err))
         exit(1)
 
 for table in TABLES:
     description = TABLES[table]
-    print ("Desc ; {}".format(description))
     try:
         print("Creating table {}".format(table))
-        kursor.execute(description)
+        KURSOR.execute(description)
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
             print ("Already exists")
         else:
             print("{}".format(err))
 
-kursor.close()
-connection.close()
+KURSOR.close()
+CON.close()
 
 
-product_items = ex.import_products(ex.categories)
-ex.record_into_database(product_items, ex.categories)
+PRODUCT_ITEMS = ex.import_products(ex.categories)
+ex.record_into_database(PRODUCT_ITEMS, ex.categories)

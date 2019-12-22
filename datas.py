@@ -1,13 +1,13 @@
 import mysql.connector
 import random
-
+import settings
 
 class Connect:
     def __init__(self):
         self.con = mysql.connector.connect(
             host='localhost',
-            user='oc_student',
-            password = "password",
+            user=settings.user,
+            password = settings.password,
             database = 'pur_beurre')
         self.cur = self.con.cursor()
         self.categories = ['Voir vos favorits']

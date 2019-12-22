@@ -3,7 +3,7 @@
 ---
 ### How to install this programm (GNU/LINUX : ubuntu)
 
-__You must have a SQL server installed on your system.__
+__You must have an SQL server installed on your system.__
 
 If not, follow the whole path.
 If so, skip step 1.
@@ -16,7 +16,7 @@ In your console, type:
 
 You can change your root password if U want, with this line:
 
-    sudo mysqladmin -u root -h localhost password your_password
+    sudo mysqladmin -u root -h localhost password (your_password)
 
 #### Step 2 (required modules installation)
 
@@ -36,11 +36,13 @@ Type those lines into mysql
 
     GRANT ALL PRIVILEGES ON pur_beurre.* TO 'oc_student'@'localhost';
 
+You can always change user name and password in "settings" module once installation finnished
+
 Exit mysql by typing 'exit'
 
 #### Step 4 (app installation)
 
-In your console type (or copy paste):
+In your console type:
 
     python3 init.py
 
